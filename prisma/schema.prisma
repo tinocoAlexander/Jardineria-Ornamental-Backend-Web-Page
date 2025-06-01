@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// Hola, este es nuestro esquema de base de datos para la aplicación de citas.
+// Aquí definimos los modelos y sus relaciones.
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+// Se tiene que hacer un .env en la raiz del proyecto con la variable DATABASE_URL
+// que apunte a la base de datos PostgreSQL que se va a utilizar.
+// Ejemplo de DATABASE_URL: postgres://user:password@localhost:5432/mydatabase LOS DATOS DE CONEXION VIENEN EN EL DOCKER COMPOSE
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+// Modelo para almacenar información de citas
+model Appointment {
+  appointmentId  String     @id @default(uuid())
+  firstName      String
+  lastName       String
+  phone          String
+  email          String
+  address        String
+  scheduledDate  DateTime
+  dateCreated    DateTime   @default(now())
+  notes          String?
+
+  services       AppointmentService[]
+}
+// Modelo para almacenar información de servicios
+model Service {
+  id             String     @id @default(uuid())
+  name           String
+  description    String?
+  status         Boolean    @default(true)
+  dateCreated    DateTime   @default(now())
+
+  appointments   AppointmentService[]
+}
+
+// Tabla intermedia para la relación muchos a muchos
+model AppointmentService {
+  appointmentId  String
+  serviceId      String
+
+  appointment    Appointment @relation(fields: [appointmentId], references: [appointmentId])
+  service        Service     @relation(fields: [serviceId], references: [id])
+
+  @@id([appointmentId, serviceId])
+}
