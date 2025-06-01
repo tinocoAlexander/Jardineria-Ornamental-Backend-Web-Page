@@ -52,3 +52,16 @@ model AppointmentService {
 
   @@id([appointmentId, serviceId])
 }
+
+// Tabla para usuarios que gestionan las citas
+model User {
+  id             String   @id @default(uuid())
+  firstName      String
+  lastName       String
+  email          String   @unique
+  password       String
+  role           String     @default("ADMIN")
+  phone          String?
+  profilePicture String?
+  createdAt      DateTime @default(now())
+}
