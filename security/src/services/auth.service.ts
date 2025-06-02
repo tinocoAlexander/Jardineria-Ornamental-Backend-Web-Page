@@ -5,7 +5,7 @@ import { prisma } from '../config/prisma';
 export const loginService = async (email: string, password: string) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user || password!=user.password/*!(await bcrypt.compare(password, user.password))*/) {
+  if (!user || !(await bcrypt.compare(password, user.password))) {
     throw new Error('Credenciales inválidas');
   }
 
