@@ -13,15 +13,19 @@ try {
     // Enviar como cookies seguras
     res.cookie('accessToken', accessToken, {
     httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
+    secure: false, // Cambiar a true en producción
+    sameSite: 'none',
+    domain: 'localhost',
+    path: '/',
     maxAge: 1000 * 60 * 15, // 15 minutos
     });
 
     res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
+    secure: false, // Cambiar a true en producción
+    sameSite: 'none',
+    domain: 'localhost',
+    path: '/',
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
     });
 

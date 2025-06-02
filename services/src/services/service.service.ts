@@ -17,3 +17,19 @@ export const getServiceById = async (id: string) => {
     where: { id },
   });
 };
+
+export const disableService = async (id: string) => {
+  return await prisma.service.update({
+    where: { id },
+    data: {
+      status: false,
+    },
+  });
+};
+
+export const updateService = async (id: string, data: Partial<Service>) => {
+  return await prisma.service.update({
+    where: { id },
+    data,
+  });
+};
