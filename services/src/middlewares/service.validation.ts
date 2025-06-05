@@ -1,3 +1,4 @@
+// Middleware para validar los datos de entrada de un servicio
 import { body } from 'express-validator';
 
 export const validateService = [

@@ -1,0 +1,393 @@
+{
+	"info": {
+		"_postman_id": "1521fa68-65eb-4906-9aac-da612fafffb6",
+		"name": "Jardineria Ornamental Web Page",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34678960"
+	},
+	"item": [
+		{
+			"name": "Appointments",
+			"item": [
+				{
+					"name": "Create an Appointment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Alexander\",\n  \"lastName\": \"Tinoco\",\n  \"phone\": \"6182318481\",\n  \"email\": \"alexnuevo040@gmail.com\",\n  \"address\": \"Av. Reforma 123, CDMX\",\n  \"scheduledDate\": \"2025-06-03T15:00:00.000Z\",\n  \"status\": \"PENDING\",\n  \"serviceIds\": [\"b940f737-0a7c-45c1-9b48-68ee3abdc9da\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/appointments/create-appointment",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"appointments",
+								"create-appointment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Appointments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/appointments/appointments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"appointments",
+								"appointments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments by Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/appointments/appointments/a5dc2833-c25c-48f9-8dcd-745edd8db15d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"appointments",
+								"appointments",
+								"a5dc2833-c25c-48f9-8dcd-745edd8db15d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Appointment",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Alexander\",\n  \"lastName\": \"Tinoco\",\n  \"phone\": \"5533344455\",\n  \"email\": \"alexander@example.com\",\n  \"address\": \"Av. Siempre Viva 742\",\n  \"scheduledDate\": \"2025-06-07T10:30:00.000Z\",\n  \"notes\": \"Cambio de dirección\",\n  \"status\": \"CONFIRMED\",\n  \"serviceIds\": [\"b940f737-0a7c-45c1-9b48-68ee3abdc9da\"]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/appointments/update-appointment/a5dc2833-c25c-48f9-8dcd-745edd8db15d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"appointments",
+								"update-appointment",
+								"a5dc2833-c25c-48f9-8dcd-745edd8db15d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Appointment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/appointments/delete-appointment/a5dc2833-c25c-48f9-8dcd-745edd8db15d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"appointments",
+								"delete-appointment",
+								"a5dc2833-c25c-48f9-8dcd-745edd8db15d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Services",
+			"item": [
+				{
+					"name": "Create a Service",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Corte de jardín\",\n  \"description\": \"Servicio profesional de corte y mantenimiento de jardines\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/api/services/create-service",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"services",
+								"create-service"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Services",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/services/services",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"services",
+								"services"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Service",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkOWFjZmJmNS0zMjU4LTRjNjYtODExYy02NTE3ZTQ1NzFkOTAiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NDg4NDQyMTUsImV4cCI6MTc0ODg0NTExNX0.m6eq-dgirr6fIZMbP81u2ZoaztQwguWlJh_Vp6PcJ-8",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3001/api/services/delete-service/b940f737-0a7c-45c1-9b48-68ee3abdc9da",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"services",
+								"delete-service",
+								"b940f737-0a7c-45c1-9b48-68ee3abdc9da"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Service by Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3001/api/services/services/b940f737-0a7c-45c1-9b48-68ee3abdc9da",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"services",
+								"services",
+								"b940f737-0a7c-45c1-9b48-68ee3abdc9da"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Servicio de Jardinería Premium\",\n  \"description\": \"Incluye poda, fertilización y mantenimiento mensual\",\n  \"status\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3001/api/services/update-service/b940f737-0a7c-45c1-9b48-68ee3abdc9da",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3001",
+							"path": [
+								"api",
+								"services",
+								"update-service",
+								"b940f737-0a7c-45c1-9b48-68ee3abdc9da"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Security",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"alexnuevo040@gmail.com\",\n    \"password\": \"prueba\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3002/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3002",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Alexander\",\n  \"lastName\": \"Tinoco\",\n  \"email\": \"alexnuevo040@gmail.com\",\n  \"password\": \"prueba\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3002/api/auth/register-admin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3002",
+							"path": [
+								"api",
+								"auth",
+								"register-admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "http://localhost:3002/api/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3002",
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3002/api/auth/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3002",
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
