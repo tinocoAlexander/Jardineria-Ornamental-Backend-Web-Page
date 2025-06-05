@@ -1,23 +1,82 @@
-# Servicio de Citas (Appointments)
+# 📅 Microservicio de Citas (`appointments`)
 
-Este módulo gestiona el registro, consulta y administración de citas en el sistema.
+Este microservicio gestiona la creación, consulta, actualización y eliminación lógica de **citas**. Forma parte del sistema de microservicios de **Jardinería Ornamental** y se comunica con una base de datos PostgreSQL mediante Prisma.
 
-## Funcionalidades principales
+---
 
-- **Crear cita**: Permite a los visitantes del sitio agendar una cita desde el frontend (React). Las solicitudes pasan por validación y reCAPTCHA.
-- **Consultar citas**: Permite al administrador ver todas las citas registradas para su gestión.
-- **Editar o eliminar citas**: Solo disponible para el administrador autenticado desde el CMS. Los visitantes no pueden modificar ni cancelar citas por sí mismos.
-- **Notificaciones**: Después de haber agendado la cita, se envía al correo electrónico de los usuarios la confirmación de que se ha agendado una cita y se comunicarán con él.
+## 📁 Estructura del Proyecto
 
-## Seguridad
+appointments/  
+├── src/  
+│ ├── controllers/  
+│ │ └── appointments.controller.ts # Controladores para manejar las citas  
+│ ├── routes/  
+│ │ └── appointments.routes.ts # Rutas HTTP para las citas  
+│ ├── services/  
+│ │ └── appointment.service.ts # Lógica del negocio de las citas  
+│ ├── middlewares/  
+│ │ └── appointment.validation.ts y validateServiceIds.ts # Validaciones  
+│ ├── types/  
+│ │ └── appointments.types.ts # Tipado de las citas  
+│ ├── config/  
+│ │ └── prisma.ts # Configuración de Prisma  
+│ ├── index.ts # Punto de entrada del microservicio  
+├── logs/ # Carpeta para guardar logs de Morgan  
+├── Dockerfile  
+├── .env  
+├── tsconfig.json  
+└── package.json  
 
-- La creación de citas está protegida con **Google reCAPTCHA** para evitar spam.
-- Las operaciones de edición y eliminación requieren autenticación administrativa.
+---
 
-## Estructura
+## 🚀 Endpoints Disponibles
 
-- `appointments.controller.ts` – Define los endpoints para crear, listar, editar y eliminar citas.
-- `appointments.routes.ts` – Rutas públicas y privadas asociadas a este módulo.
-- `appointment.model.ts` – Esquema del modelo de cita si se usa un ORM.
-- `appointment.service.ts` – Uso de RabbitMQ para poder enviar colas y que los correos electrónicos sean enviados.
+Base URL: `/api/appointments`
+
+| Método | Ruta                                   | Descripción                                  |
+|--------|----------------------------------------|----------------------------------------------|
+| POST   | `/create-appointment`                  | Crea una nueva cita                          |
+| GET    | `/appointments`                        | Obtiene todas las citas activas              |
+| GET    | `/appointments/:id`                    | Obtiene una cita por su ID                   |
+| PUT    | `/update-appointment/:id`              | Actualiza una cita existente                 |
+| DELETE | `/delete-appointment/:id`              | Elimina lógicamente una cita (status = "DELETED") |
+
+---
+
+## ⚙️ Instalación
+
+```bash
+# Clona el repositorio raíz y entra a la carpeta appointments
+cd appointments
+
+# Instala dependencias
+npm install
+
+# Genera Prisma Client
+npx prisma generate
+
+# Inicia el servidor
+npm run dev
+
+```
+
+## 🌐 Variables de Entorno
+
+Crea un archivo .env con la siguiente variable:
+
+DATABASE_URL=postgresql://admin:admin123@postgres:5432/ornamentalwebpagedb
+
+## 🧱 Construcción con Docker
+
+Este servicio está listo para ser ejecutado en un entorno Docker. Se comunica internamente con los servicios postgres y services.
+
+docker-compose up --build
+
+## 📌 Notas
+
+- Usa morgan para logs de peticiones HTTP.
+
+- Usa helmet para protección básica contra vulnerabilidades comunes.
+
+- Usa CORS configurado para aceptar solo peticiones desde el frontend.
 

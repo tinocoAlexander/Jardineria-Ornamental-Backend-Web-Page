@@ -7,5 +7,6 @@ export interface Appointment {
     address: string;
     scheduledDate: Date;
     notes?: string;
+    status: string;
     serviceIds: string[];
 }

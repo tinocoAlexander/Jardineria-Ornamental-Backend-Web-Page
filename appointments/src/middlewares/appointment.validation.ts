@@ -9,5 +9,6 @@ export const validateAppointment = [
     body('email').isEmail().withMessage('Debe ser un email válido'),
     body('address').notEmpty().withMessage('La dirección es obligatoria'),
     body('scheduledDate').notEmpty().withMessage('La fecha para agendar la cita es obligatoria'),
+    body('status').notEmpty().withMessage('El estado es obligatorio'),
     body('serviceIds').isArray({ min: 1 }).withMessage('Debes seleccionar al menos un servicio'),
 ];
