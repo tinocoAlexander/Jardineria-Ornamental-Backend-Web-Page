@@ -142,3 +142,61 @@ export const getAppointmentsByService = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error al obtener citas por servicio' });
   }
 };
+
+// Estadísticas generales para el panel admin
+export const getAppointmentStats = async (_req: Request, res: Response) => {
+  try {
+    const total = await Appointment.countDocuments();
+    const atendidas = await Appointment.countDocuments({ atendido: true });
+    const pendientes = await Appointment.countDocuments({ atendido: false });
+
+    const porServicio = await Appointment.aggregate([
+      { $group: { _id: "$servicio", cantidad: { $sum: 1 } } },
+      { $sort: { cantidad: -1 } }
+    ]);
+
+    const ahora = new Date();
+    const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    const finMes = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0);
+
+    const citasMes = await Appointment.countDocuments({
+      fecha: { $gte: inicioMes, $lte: finMes }
+    });
+
+    res.json({
+      total,
+      atendidas,
+      pendientes,
+      citasMes,
+      porServicio,
+    });
+  } catch (error) {
+    console.error("Error al obtener estadísticas:", error);
+    res.status(500).json({ message: "Error al obtener estadísticas" });
+  }
+};
+
+// Vista por calendario
+export const getCalendarView = async (_req: Request, res: Response) => {
+  try {
+    const citas = await Appointment.find();
+
+    const calendario = citas.map(cita => {
+      const duracionEnMinutos = 60; 
+      const start = new Date(cita.fecha);
+      const end = new Date(start.getTime() + duracionEnMinutos * 60000);
+
+      return {
+        id: cita._id,
+        title: `${cita.servicio} - ${cita.nombre}`,
+        start,
+        end,
+        estado: cita.atendido ? 'atendida' : 'pendiente'
+      };
+    });
+
+    res.json(calendario);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener calendario de citas' });
+  }
+};

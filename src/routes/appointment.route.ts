@@ -10,6 +10,8 @@ import {
   getPendingAppointments,
   getAppointmentsByDate,
   getAppointmentsByService,
+  getAppointmentStats,
+  getCalendarView,
 } from '../controllers/appointment.controller';
 
 import { authMiddleware } from '../middlewares/auth.middleware';
@@ -31,5 +33,8 @@ router.delete('/:id', authMiddleware, deleteAppointment);
 
 router.patch('/:id/atendido', authMiddleware, toggleAtendido); 
 router.patch('/:id/observaciones', authMiddleware, updateObservaciones); 
+
+router.get('/stats', authMiddleware, getAppointmentStats);
+router.get('/calendar', authMiddleware, getCalendarView);
 
 export default router;

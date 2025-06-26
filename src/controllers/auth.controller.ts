@@ -31,9 +31,23 @@ export const login = async (req: Request, res: Response) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(401).json({ message: 'Credenciales inválidas' });
 
-  const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
+  const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', {
+    expiresIn: '15m'
+  });
 
-  return res.json({ token, user: { nombre: user.nombre, email: user.email } });
+  const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET || 'secret', {
+    expiresIn: '7d'
+  });
+
+  // Guardar el refresh token en cookie segura
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 días
+  });
+
+  return res.json({ accessToken, user: { email: user.email, nombre: user.nombre } });
 };
 
 // Verifica si el token es válido
@@ -46,5 +60,22 @@ export const verifyToken = async (req: Request, res: Response) => {
     res.json({ valid: true, decoded });
   } catch (error) {
     res.status(401).json({ valid: false, message: 'Token inválido o expirado' });
+  }
+};
+
+// Refresca el token
+export const refreshToken = async (req: Request, res: Response) => {
+  const token = req.cookies.refreshToken;
+  if (!token) return res.status(401).json({ message: 'No refresh token provided' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as { id: string };
+    const newAccessToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET || 'secret', {
+      expiresIn: '15m'
+    });
+
+    res.json({ accessToken: newAccessToken });
+  } catch (error) {
+    return res.status(401).json({ message: 'Refresh token inválido o expirado' });
   }
 };
