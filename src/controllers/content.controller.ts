@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Content } from '../models/Content';
 
+// Crear contenido
 export const createContent = async (req: Request, res: Response) => {
   try {
     const content = new Content(req.body);
@@ -11,6 +12,7 @@ export const createContent = async (req: Request, res: Response) => {
   }
 };
 
+// Obtener todo el contenido
 export const getAllContent = async (_req: Request, res: Response) => {
   try {
     const content = await Content.find();
@@ -20,6 +22,7 @@ export const getAllContent = async (_req: Request, res: Response) => {
   }
 };
 
+// Actualizar contenido
 export const updateContent = async (req: Request, res: Response) => {
   try {
     const updated = await Content.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -30,6 +33,7 @@ export const updateContent = async (req: Request, res: Response) => {
   }
 };
 
+// Borrar contenido
 export const deleteContent = async (req: Request, res: Response) => {
   try {
     const deleted = await Content.findByIdAndDelete(req.params.id);
@@ -37,5 +41,23 @@ export const deleteContent = async (req: Request, res: Response) => {
     res.json({ message: 'Contenido borrado' });
   } catch (error) {
     res.status(500).json({ message: 'Error al borrar el contenido' });
+  }
+};
+
+// Cambiar estado activo/inactivo
+export const toggleActivo = async (req: Request, res: Response) => {
+  try {
+    const content = await Content.findById(req.params.id);
+    if (!content) return res.status(404).json({ message: 'Contenido no encontrado' });
+
+    content.activo = !content.activo;
+    await content.save();
+
+    res.json({
+      message: `Contenido ${content.activo ? 'activado' : 'desactivado'}`,
+      content,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al cambiar estado del contenido' });
   }
 };

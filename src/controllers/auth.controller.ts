@@ -35,3 +35,16 @@ export const login = async (req: Request, res: Response) => {
 
   return res.json({ token, user: { nombre: user.nombre, email: user.email } });
 };
+
+// Verifica si el token es válido
+export const verifyToken = async (req: Request, res: Response) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ valid: false, message: 'Token requerido' });
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    res.json({ valid: true, decoded });
+  } catch (error) {
+    res.status(401).json({ valid: false, message: 'Token inválido o expirado' });
+  }
+};

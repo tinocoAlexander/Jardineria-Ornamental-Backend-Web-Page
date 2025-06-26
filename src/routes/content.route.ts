@@ -4,6 +4,7 @@ import {
   getAllContent,
   updateContent,
   deleteContent,
+  toggleActivo
 } from '../controllers/content.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 
@@ -16,5 +17,6 @@ router.get('/', getAllContent);
 router.post('/', authMiddleware, createContent);
 router.put('/:id', authMiddleware, updateContent);
 router.delete('/:id', authMiddleware, deleteContent);
+router.patch('/:id/activo', authMiddleware, toggleActivo);
 
 export default router;

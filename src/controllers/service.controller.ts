@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Service } from '../models/Service';
 
+// Crear un servicio
 export const createService = async (req: Request, res: Response) => {
   try {
     const service = new Service(req.body);
@@ -11,6 +12,7 @@ export const createService = async (req: Request, res: Response) => {
   }
 };
 
+// Obtener todos los servicios
 export const getServices = async (_req: Request, res: Response) => {
   try {
     const services = await Service.find({ activo: true });
@@ -20,6 +22,7 @@ export const getServices = async (_req: Request, res: Response) => {
   }
 };
 
+// Actualizar servicio
 export const updateService = async (req: Request, res: Response) => {
   try {
     const service = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -30,6 +33,7 @@ export const updateService = async (req: Request, res: Response) => {
   }
 };
 
+// Borrar servicio
 export const deleteService = async (req: Request, res: Response) => {
   try {
     const service = await Service.findByIdAndDelete(req.params.id);
@@ -37,5 +41,23 @@ export const deleteService = async (req: Request, res: Response) => {
     res.json({ message: 'Servicio eliminado' });
   } catch (error) {
     res.status(500).json({ message: 'Error eliminando el servicio' });
+  }
+};
+
+// Cambiar estado activo/inactivo
+export const toggleEstadoService = async (req: Request, res: Response) => {
+  try {
+    const servicio = await Service.findById(req.params.id);
+    if (!servicio) return res.status(404).json({ message: 'Servicio no encontrado' });
+
+    servicio.activo = !servicio.activo;
+    await servicio.save();
+
+    res.json({
+      message: `Servicio ${servicio.activo ? 'activado' : 'desactivado'}`,
+      servicio,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al cambiar el estado del servicio' });
   }
 };

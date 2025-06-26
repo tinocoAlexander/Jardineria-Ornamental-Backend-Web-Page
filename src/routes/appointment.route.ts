@@ -2,19 +2,34 @@ import { Router } from 'express';
 import {
   createAppointment,
   getAppointments,
+  getAppointmentById,
   updateAppointment,
-  deleteAppointment
+  deleteAppointment,
+  toggleAtendido,
+  updateObservaciones,
+  getPendingAppointments,
+  getAppointmentsByDate,
+  getAppointmentsByService,
 } from '../controllers/appointment.controller';
+
 import { authMiddleware } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// Cliente
-router.post('/', createAppointment);
+// Cliennte
+router.post('/', createAppointment); 
 
 // Admin
-router.get('/', authMiddleware, getAppointments);
-router.put('/:id', authMiddleware, updateAppointment);
-router.delete('/:id', authMiddleware, deleteAppointment);
+router.get('/', authMiddleware, getAppointments); 
+router.get('/pending', authMiddleware, getPendingAppointments); 
+router.get('/by-date', authMiddleware, getAppointmentsByDate); 
+router.get('/by-service/:servicio', authMiddleware, getAppointmentsByService); 
+router.get('/:id', authMiddleware, getAppointmentById); 
+
+router.put('/:id', authMiddleware, updateAppointment); 
+router.delete('/:id', authMiddleware, deleteAppointment); 
+
+router.patch('/:id/atendido', authMiddleware, toggleAtendido); 
+router.patch('/:id/observaciones', authMiddleware, updateObservaciones); 
 
 export default router;
