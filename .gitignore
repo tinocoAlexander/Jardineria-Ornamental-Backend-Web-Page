@@ -1,0 +1,41 @@
+# Dependencias
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Entornos
+.env
+.env.*.local
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Compilación
+dist/
+build/
+coverage/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# IDEs y editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Otros
+.cache/
+.eslintcache
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
