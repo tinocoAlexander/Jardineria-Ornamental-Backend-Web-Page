@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
   createAppointment,
   getAppointments,
@@ -12,29 +12,29 @@ import {
   getAppointmentsByService,
   getAppointmentStats,
   getCalendarView,
-} from '../controllers/appointment.controller';
+} from "../controllers/appointment.controller";
 
-import { authMiddleware } from '../middlewares/auth.middleware';
+import { authMiddleware } from "../middlewares/auth.middleware";
 
 const router = Router();
 
 // Cliennte
-router.post('/', createAppointment); 
+router.post("/", createAppointment);
 
 // Admin
-router.get('/', authMiddleware, getAppointments); 
-router.get('/pending', authMiddleware, getPendingAppointments); 
-router.get('/by-date', authMiddleware, getAppointmentsByDate); 
-router.get('/by-service/:servicio', authMiddleware, getAppointmentsByService); 
-router.get('/:id', authMiddleware, getAppointmentById); 
+router.get("/", authMiddleware, getAppointments);
+router.get("/pending", authMiddleware, getPendingAppointments);
+router.get("/by-date", authMiddleware, getAppointmentsByDate);
+router.get("/by-service/:servicio", authMiddleware, getAppointmentsByService);
+router.get("/:id", authMiddleware, getAppointmentById);
 
-router.put('/:id', authMiddleware, updateAppointment); 
-router.delete('/:id', authMiddleware, deleteAppointment); 
+router.put("/:id", authMiddleware, updateAppointment);
+router.delete("/:id", authMiddleware, deleteAppointment);
 
-router.patch('/:id/atendido', authMiddleware, toggleAtendido); 
-router.patch('/:id/observaciones', authMiddleware, updateObservaciones); 
+router.patch("/:id/atendido", authMiddleware, toggleAtendido);
+router.patch("/:id/observaciones", authMiddleware, updateObservaciones);
 
-router.get('/stats', authMiddleware, getAppointmentStats);
-router.get('/calendar', authMiddleware, getCalendarView);
+router.get("/stats", authMiddleware, getAppointmentStats);
+router.get("/calendar", authMiddleware, getCalendarView);
 
 export default router;

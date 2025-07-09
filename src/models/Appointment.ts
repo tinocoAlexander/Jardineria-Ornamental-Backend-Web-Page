@@ -1,27 +1,39 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface IAppointment extends Document {
-  nombre: string;
+  name: String;
   email: string;
-  telefono: string;
-  fecha: Date;
-  mensaje?: string;
-  servicio: string;
-  atendido: boolean;
-  observaciones?: string;
+  phone: String;
+  service: String;
+  date: Date;
+  message?: String;
+  atendido: "pendiente" | "confirmado" | "completado";
+  observaciones?: String;
+  status: boolean;
 }
 
-const AppointmentSchema = new Schema<IAppointment>({
-  nombre: { type: String, required: true },
-  email: { type: String, required: true },
-  telefono: { type: String, required: true },
-  fecha: { type: Date, required: true },
-  mensaje: { type: String },
-  servicio: { type: String, required: true },
-  atendido: { type: Boolean, default: false },
-  observaciones: { type: String }, 
-}, {
-  timestamps: true
-});
+const AppointmentSchema = new Schema<IAppointment>(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    date: { type: Date, required: true },
+    message: { type: String },
+    service: { type: String, required: true },
+    atendido: {
+      type: String,
+      enum: ["pendiente", "confirmado", "completado"],
+      default: "pendiente",
+    },
+    observaciones: { type: String },
+    status: { type: Boolean, default: true },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export const Appointment = mongoose.model<IAppointment>('Appointment', AppointmentSchema);
+export const Appointment = mongoose.model<IAppointment>(
+  "Appointment",
+  AppointmentSchema
+);

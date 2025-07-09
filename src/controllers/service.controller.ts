@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { Service } from '../models/Service';
+import { Request, Response } from "express";
+import { Service } from "../models/Service";
 
 // Crear un servicio
 export const createService = async (req: Request, res: Response) => {
@@ -8,7 +8,7 @@ export const createService = async (req: Request, res: Response) => {
     await service.save();
     res.status(201).json(service);
   } catch (error) {
-    res.status(500).json({ message: 'Error creando el servicio' });
+    res.status(500).json({ message: "Error creando el servicio" });
   }
 };
 
@@ -18,29 +18,39 @@ export const getServices = async (_req: Request, res: Response) => {
     const services = await Service.find({ activo: true });
     res.json(services);
   } catch (error) {
-    res.status(500).json({ message: 'Error obteniendo los servicios' });
+    res.status(500).json({ message: "Error obteniendo los servicios" });
   }
 };
 
 // Actualizar servicio
 export const updateService = async (req: Request, res: Response) => {
   try {
-    const service = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!service) return res.status(404).json({ message: 'Servicio no encontrado' });
+    const service = await Service.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    if (!service)
+      return res.status(404).json({ message: "Servicio no encontrado" });
     res.json(service);
   } catch (error) {
-    res.status(500).json({ message: 'Error actualizando el servicio' });
+    res.status(500).json({ message: "Error actualizando el servicio" });
   }
 };
 
 // Borrar servicio
 export const deleteService = async (req: Request, res: Response) => {
   try {
-    const service = await Service.findByIdAndDelete(req.params.id);
-    if (!service) return res.status(404).json({ message: 'Servicio no encontrado' });
-    res.json({ message: 'Servicio eliminado' });
+    const service = await Service.findByIdAndUpdate(
+      req.params.id,
+      { activo: false },
+      { new: true }
+    );
+
+    if (!service)
+      return res.status(404).json({ message: "Servicio no encontrado" });
+
+    res.json({ message: "Servicio dado de baja correctamente", service });
   } catch (error) {
-    res.status(500).json({ message: 'Error eliminando el servicio' });
+    res.status(500).json({ message: "Error al dar de baja el servicio" });
   }
 };
 
@@ -48,16 +58,19 @@ export const deleteService = async (req: Request, res: Response) => {
 export const toggleEstadoService = async (req: Request, res: Response) => {
   try {
     const servicio = await Service.findById(req.params.id);
-    if (!servicio) return res.status(404).json({ message: 'Servicio no encontrado' });
+    if (!servicio)
+      return res.status(404).json({ message: "Servicio no encontrado" });
 
     servicio.activo = !servicio.activo;
     await servicio.save();
 
     res.json({
-      message: `Servicio ${servicio.activo ? 'activado' : 'desactivado'}`,
+      message: `Servicio ${servicio.activo ? "activado" : "desactivado"}`,
       servicio,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error al cambiar el estado del servicio' });
+    res
+      .status(500)
+      .json({ message: "Error al cambiar el estado del servicio" });
   }
 };
