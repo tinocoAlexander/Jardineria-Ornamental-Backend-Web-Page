@@ -15,18 +15,22 @@ const ai = new GoogleGenAI({
 });
 
 // Ruta para poder logearse
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email }).select("+password");
 
-    if (!user)
-      return res.status(404).json({ message: "Usuario no encontrado" });
+    if (!user) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+      return;
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Contraseña incorrecta" });
+    if (!isMatch) {
+      res.status(400).json({ message: "Contraseña incorrecta" });
+      return;
+    }
 
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: "1h",
@@ -47,38 +51,43 @@ export const login = async (req: Request, res: Response) => {
 };
 
 // Ruta para poder crear un administradors
-export const registerAdmin = async (req: Request, res: Response) => {
+export const registerAdmin = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { nombre, email, password } = req.body;
 
     const existingAdmin = await User.findOne({ email });
-    if (existingAdmin)
-      return res
-        .status(403)
-        .json({ message: "El usuario con ese correo ya existe" });
+    if (existingAdmin) {
+      res.status(403).json({ message: "El usuario con ese correo ya existe" });
+      return;
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ nombre, email, password: hashedPassword });
     await user.save();
 
-    return res.status(201).json({ message: "Se ha creado el administrador" });
+    res.status(201).json({ message: "Se ha creado el administrador" });
   } catch (error) {
-    return res.status(500).json({ message: "Error al crear el administrador" });
+    res.status(500).json({ message: "Error al crear el administrador" });
   }
 };
 
 // Obtener todos los usuarios excepto el que está en sesión
-export const getUsers = async (req: Request, res: Response) => {
+export const getUsers = async (req: Request, res: Response): Promise<void> => {
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token)
-    return res.status(401).json({ message: "Token no proporcionado" });
+  if (!token) {
+    res.status(401).json({ message: "Token no proporcionado" });
+    return;
+  }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
 
-    const usuarios = await User.find({
-      _id: { $ne: decoded.userId },
-    }).select("-password");
+    const usuarios = await User.find({ _id: { $ne: decoded.userId } }).select(
+      "-password"
+    );
 
     res.json(usuarios);
   } catch (error) {
@@ -88,16 +97,23 @@ export const getUsers = async (req: Request, res: Response) => {
 };
 
 // Actualizar perfil de usuario
-export const updateProfile = async (req: Request, res: Response) => {
+export const updateProfile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token)
-    return res.status(401).json({ message: "Token no proporcionado" });
+  if (!token) {
+    res.status(401).json({ message: "Token no proporcionado" });
+    return;
+  }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
     const user = await User.findById(decoded.userId);
-    if (!user)
-      return res.status(404).json({ message: "Usuario no encontrado" });
+    if (!user) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+      return;
+    }
 
     const { nombre, apellido, telefono, direccion, avatar } = req.body;
 
@@ -114,59 +130,71 @@ export const updateProfile = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error al actualizar perfil" });
   }
 };
+
 // Verifica si el token es válido
-export const verifyToken = async (req: Request, res: Response) => {
+export const verifyToken = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "No token provided" });
+  if (!token) {
+    res.status(401).json({ message: "No token provided" });
+    return;
+  }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
     const user = await User.findById(decoded.userId).select("-password");
 
-    if (!user)
-      return res.status(404).json({ message: "Usuario no encontrado" });
+    if (!user) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+      return;
+    }
 
     res.json({ user });
   } catch (error) {
-    return res.status(401).json({ message: "Token inválido o expirado" });
+    res.status(401).json({ message: "Token inválido o expirado" });
   }
 };
 
 // Refresca el token
-export const refreshToken = async (req: Request, res: Response) => {
+export const refreshToken = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const token = req.cookies.refreshToken;
-  if (!token)
-    return res.status(401).json({ message: "No refresh token provided" });
+  if (!token) {
+    res.status(401).json({ message: "No refresh token provided" });
+    return;
+  }
 
   try {
-    const decoded = jwt.verify(token, "secret") as {
-      id: string;
-    };
+    const decoded = jwt.verify(token, "secret") as { id: string };
     const newAccessToken = jwt.sign({ id: decoded.id }, "secret", {
       expiresIn: "15m",
     });
 
     res.json({ accessToken: newAccessToken });
   } catch (error) {
-    return res
-      .status(401)
-      .json({ message: "Refresh token inválido o expirado" });
+    res.status(401).json({ message: "Refresh token inválido o expirado" });
   }
 };
 
 // Ruta para IA Gemini
-export const geminiChatRoute = async (req: Request, res: Response) => {
+export const geminiChatRoute = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { prompt } = req.body;
 
   if (!prompt) {
-    return res.status(400).json({ error: "El prompt es requerido." });
+    res.status(400).json({ error: "El prompt es requerido." });
+    return;
   }
 
   try {
-    // Consulta solo servicios activos
     const servicios = await Service.find({ activo: true });
 
-    // Prepara el resumen para enviar al modelo
     const resumenServicios = servicios.length
       ? servicios
           .map(
@@ -197,9 +225,8 @@ Pregunta del cliente: ${prompt}
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!text) {
-      return res
-        .status(500)
-        .json({ error: "No se recibió respuesta del modelo." });
+      res.status(500).json({ error: "No se recibió respuesta del modelo." });
+      return;
     }
 
     res.json({ reply: text });
@@ -207,13 +234,13 @@ Pregunta del cliente: ${prompt}
     console.error("Error en Gemini:", error);
 
     if (error.status === 429) {
-      return res.status(429).json({
-        error: "Demasiadas peticiones. Intenta de nuevo más tarde.",
-      });
+      res
+        .status(429)
+        .json({ error: "Demasiadas peticiones. Intenta de nuevo más tarde." });
+    } else {
+      res
+        .status(500)
+        .json({ error: "Hubo un error al procesar la petición con Gemini." });
     }
-
-    res.status(500).json({
-      error: "Hubo un error al procesar la petición con Gemini.",
-    });
   }
 };
