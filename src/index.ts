@@ -4,15 +4,14 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
-
 import connectDB from "./config/db";
-
 import authRoutes from "./routes/auth.route";
 import contentRoutes from "./routes/content.route";
 import serviceRoutes from "./routes/service.route";
 import appointmentRoutes from "./routes/appointment.route";
 
 dotenv.config();
+
 connectDB();
 const app = express();
 
@@ -23,7 +22,7 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "0.2mb" }));
 
 app.use(cookieParser());
 app.use(helmet());
@@ -47,7 +46,7 @@ app.use("/api/services", serviceRoutes);
 // Rutas de citas
 app.use("/api/appointments", appointmentRoutes);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 
 connectDB().then(() => {
   console.log("Base de datos conectada correctamente");

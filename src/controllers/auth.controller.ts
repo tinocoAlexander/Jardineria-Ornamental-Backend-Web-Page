@@ -2,10 +2,19 @@ import { Request, Response } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import axios from "axios";
+import dotenv from "dotenv";
+import { GoogleGenAI } from "@google/genai";
+import { Service } from "../models/Service";
+
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || "contraseniasegura";
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY!,
+});
 
 // Ruta para poder logearse
-const JWT_SECRET = process.env.JWT_SECRET || "contraseniasegura";
-
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -25,7 +34,12 @@ export const login = async (req: Request, res: Response) => {
 
     res.json({
       token,
-      user: { id: user._id, nombre: user.nombre, email: user.email },
+      user: {
+        id: user._id,
+        nombre: user.nombre,
+        email: user.email,
+        avatar: user.avatar,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: "Error en el servidor" });
@@ -53,6 +67,53 @@ export const registerAdmin = async (req: Request, res: Response) => {
   }
 };
 
+// Obtener todos los usuarios excepto el que está en sesión
+export const getUsers = async (req: Request, res: Response) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token)
+    return res.status(401).json({ message: "Token no proporcionado" });
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+
+    const usuarios = await User.find({
+      _id: { $ne: decoded.userId },
+    }).select("-password");
+
+    res.json(usuarios);
+  } catch (error) {
+    console.error("❌ Error al obtener usuarios:", error);
+    res.status(401).json({ message: "Token inválido o expirado" });
+  }
+};
+
+// Actualizar perfil de usuario
+export const updateProfile = async (req: Request, res: Response) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token)
+    return res.status(401).json({ message: "Token no proporcionado" });
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    const user = await User.findById(decoded.userId);
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
+
+    const { nombre, apellido, telefono, direccion, avatar } = req.body;
+
+    if (nombre) user.nombre = nombre;
+    if (apellido) user.apellido = apellido;
+    if (telefono) user.telefono = telefono;
+    if (direccion) user.direccion = direccion;
+    if (avatar) user.avatar = avatar;
+
+    await user.save();
+    res.json({ message: "Perfil actualizado", user });
+  } catch (error) {
+    console.error("❌ Error al actualizar perfil:", error);
+    res.status(500).json({ message: "Error al actualizar perfil" });
+  }
+};
 // Verifica si el token es válido
 export const verifyToken = async (req: Request, res: Response) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -90,5 +151,69 @@ export const refreshToken = async (req: Request, res: Response) => {
     return res
       .status(401)
       .json({ message: "Refresh token inválido o expirado" });
+  }
+};
+
+// Ruta para IA Gemini
+export const geminiChatRoute = async (req: Request, res: Response) => {
+  const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ error: "El prompt es requerido." });
+  }
+
+  try {
+    // Consulta solo servicios activos
+    const servicios = await Service.find({ activo: true });
+
+    // Prepara el resumen para enviar al modelo
+    const resumenServicios = servicios.length
+      ? servicios
+          .map(
+            (s) => `• ${s.nombre}: ${s.descripcion} — Precio desde $${s.precio}`
+          )
+          .join("\n")
+      : "Actualmente no hay servicios disponibles.";
+
+    const contexto = `
+Eres un asistente de la empresa "Jardineria ornamental", experto en automatización de jardines y en la jardineria en general. 
+Estos son los servicios actuales que ofrece la empresa:
+${resumenServicios}
+
+Responde con claridad y detalle cualquier duda del cliente, sobre los servicios que tenemos o sobre cualquier otra cosa.
+Pregunta del cliente: ${prompt}
+    `;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash-001",
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: contexto }],
+        },
+      ],
+    });
+
+    const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      return res
+        .status(500)
+        .json({ error: "No se recibió respuesta del modelo." });
+    }
+
+    res.json({ reply: text });
+  } catch (error: any) {
+    console.error("Error en Gemini:", error);
+
+    if (error.status === 429) {
+      return res.status(429).json({
+        error: "Demasiadas peticiones. Intenta de nuevo más tarde.",
+      });
+    }
+
+    res.status(500).json({
+      error: "Hubo un error al procesar la petición con Gemini.",
+    });
   }
 };
