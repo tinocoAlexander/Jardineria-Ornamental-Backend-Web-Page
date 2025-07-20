@@ -3,7 +3,10 @@ import { Appointment } from "../models/Appointment";
 import { sendAppointmentMail } from "../utils/mailer";
 
 // Crear una cita
-export const createAppointment = async (req: Request, res: Response) => {
+export const createAppointment = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const cita = new Appointment(req.body);
     await cita.save();
@@ -29,7 +32,10 @@ export const createAppointment = async (req: Request, res: Response) => {
 };
 
 // Obtener todas las citas
-export const getAppointments = async (_req: Request, res: Response) => {
+export const getAppointments = async (
+  _req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const citas = await Appointment.find({ status: true }).sort({ date: 1 });
     res.json(citas);
@@ -39,12 +45,18 @@ export const getAppointments = async (_req: Request, res: Response) => {
 };
 
 // Actualizar cita
-export const updateAppointment = async (req: Request, res: Response) => {
+export const updateAppointment = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const cita = await Appointment.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
-    if (!cita) return res.status(404).json({ message: "Cita no encontrada" });
+    if (!cita) {
+      res.status(404).json({ message: "Cita no encontrada" });
+      return;
+    }
     res.json(cita);
   } catch (error) {
     res.status(500).json({ message: "Error al actualizar la cita" });
@@ -52,7 +64,10 @@ export const updateAppointment = async (req: Request, res: Response) => {
 };
 
 // Borrar citas
-export const deleteAppointment = async (req: Request, res: Response) => {
+export const deleteAppointment = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const cita = await Appointment.findByIdAndUpdate(
       req.params.id,
@@ -60,7 +75,10 @@ export const deleteAppointment = async (req: Request, res: Response) => {
       { new: true }
     );
 
-    if (!cita) return res.status(404).json({ message: "Cita no encontrada" });
+    if (!cita) {
+      res.status(404).json({ message: "Cita no encontrada" });
+      return;
+    }
 
     res.json({ message: "Cita eliminada correctamente (baja lógica)", cita });
   } catch (error) {
@@ -69,10 +87,16 @@ export const deleteAppointment = async (req: Request, res: Response) => {
 };
 
 // Obtener cita por ID
-export const getAppointmentById = async (req: Request, res: Response) => {
+export const getAppointmentById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const cita = await Appointment.findById(req.params.id);
-    if (!cita) return res.status(404).json({ message: "Cita no encontrada" });
+    if (!cita) {
+      res.status(404).json({ message: "Cita no encontrada" });
+      return;
+    }
     res.json(cita);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener la cita" });
@@ -80,10 +104,16 @@ export const getAppointmentById = async (req: Request, res: Response) => {
 };
 
 // Cambiar estado atendido
-export const toggleAtendido = async (req: Request, res: Response) => {
+export const toggleAtendido = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const cita = await Appointment.findById(req.params.id);
-    if (!cita) return res.status(404).json({ message: "Cita no encontrada" });
+    if (!cita) {
+      res.status(404).json({ message: "Cita no encontrada" });
+      return;
+    }
 
     let nuevoEstado = cita.atendido;
 
@@ -106,7 +136,7 @@ export const toggleAtendido = async (req: Request, res: Response) => {
 };
 
 // Actualizar observaciones
-export const updateObservaciones = async (req: Request, res: Response) => {
+export const updateObservaciones = async (req: Request, res: Response): Promise<void> => {
   try {
     const { observaciones } = req.body;
     const cita = await Appointment.findByIdAndUpdate(
@@ -114,32 +144,34 @@ export const updateObservaciones = async (req: Request, res: Response) => {
       { observaciones },
       { new: true }
     );
-    if (!cita) return res.status(404).json({ message: "Cita no encontrada" });
+    if (!cita) {
+      res.status(404).json({ message: "Cita no encontrada" });
+      return;
+    }
     res.json(cita);
   } catch (error) {
     res.status(500).json({ message: "Error al actualizar observaciones" });
   }
 };
 
+
 // Obtener solo citas no atendidas
-export const getPendingAppointments = async (_req: Request, res: Response) => {
+export const getPendingAppointments = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const citas = await Appointment.find({ atendido: false }).sort({
-      fecha: 1,
-    });
+    const citas = await Appointment.find({ atendido: false }).sort({ fecha: 1 });
     res.json(citas);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener citas pendientes" });
   }
 };
 
+
 // Citas por rango de fechas
-export const getAppointmentsByDate = async (req: Request, res: Response) => {
+export const getAppointmentsByDate = async (req: Request, res: Response): Promise<void> => {
   const { start, end } = req.query;
   if (!start || !end) {
-    return res
-      .status(400)
-      .json({ message: "Parámetros start y end requeridos" });
+    res.status(400).json({ message: "Parámetros start y end requeridos" });
+    return;
   }
 
   try {
@@ -156,8 +188,9 @@ export const getAppointmentsByDate = async (req: Request, res: Response) => {
   }
 };
 
+
 // Citas por servicio
-export const getAppointmentsByService = async (req: Request, res: Response) => {
+export const getAppointmentsByService = async (req: Request, res: Response): Promise<void> => {
   const { servicio } = req.params;
   try {
     const citas = await Appointment.find({ servicio }).sort({ fecha: 1 });
@@ -167,8 +200,9 @@ export const getAppointmentsByService = async (req: Request, res: Response) => {
   }
 };
 
+
 // Estadísticas generales para el panel admin
-export const getAppointmentStats = async (_req: Request, res: Response) => {
+export const getAppointmentStats = async (_req: Request, res: Response): Promise<void> => {
   try {
     const total = await Appointment.countDocuments();
     const atendidas = await Appointment.countDocuments({ atendido: true });
@@ -200,8 +234,9 @@ export const getAppointmentStats = async (_req: Request, res: Response) => {
   }
 };
 
+
 // Vista por calendario
-export const getCalendarView = async (_req: Request, res: Response) => {
+export const getCalendarView = async (_req: Request, res: Response): Promise<void> => {
   try {
     const citas = await Appointment.find();
 
@@ -224,3 +259,4 @@ export const getCalendarView = async (_req: Request, res: Response) => {
     res.status(500).json({ message: "Error al obtener calendario de citas" });
   }
 };
+
