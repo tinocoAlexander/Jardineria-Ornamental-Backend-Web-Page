@@ -7,11 +7,12 @@ export const authMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "No autorizado" });
+    res.status(401).json({ message: "No autorizado" });
+    return;
   }
 
   const token = authHeader.split(" ")[1];
@@ -21,6 +22,6 @@ export const authMiddleware = (
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Token inválido" });
+    res.status(401).json({ message: "Token inválido" });
   }
 };
