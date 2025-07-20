@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { Content } from "../models/Content";
 
-// Crear contenido
-export const createContent = async (req: Request, res: Response) => {
+export const createContent = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const content = new Content(req.body);
     await content.save();
@@ -13,8 +15,10 @@ export const createContent = async (req: Request, res: Response) => {
   }
 };
 
-// Obtener todo el contenido
-export const getAllContent = async (_req: Request, res: Response) => {
+export const getAllContent = async (
+  _req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const content = await Content.find();
     res.json(content);
@@ -24,14 +28,18 @@ export const getAllContent = async (_req: Request, res: Response) => {
   }
 };
 
-// Actualizar contenido por ID
-export const updateContent = async (req: Request, res: Response) => {
+export const updateContent = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const updated = await Content.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
-    if (!updated)
-      return res.status(404).json({ message: "Contenido no encontrado" });
+    if (!updated) {
+      res.status(404).json({ message: "Contenido no encontrado" });
+      return;
+    }
     res.json(updated);
   } catch (error) {
     console.error("❌ Error al actualizar contenido:", error);
@@ -39,12 +47,16 @@ export const updateContent = async (req: Request, res: Response) => {
   }
 };
 
-// Borrar contenido por ID
-export const deleteContent = async (req: Request, res: Response) => {
+export const deleteContent = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const deleted = await Content.findByIdAndDelete(req.params.id);
-    if (!deleted)
-      return res.status(404).json({ message: "Contenido no encontrado" });
+    if (!deleted) {
+      res.status(404).json({ message: "Contenido no encontrado" });
+      return;
+    }
     res.json({ message: "Contenido eliminado" });
   } catch (error) {
     console.error("❌ Error al borrar contenido:", error);
@@ -52,12 +64,16 @@ export const deleteContent = async (req: Request, res: Response) => {
   }
 };
 
-// Cambiar estado activo/inactivo
-export const toggleActivo = async (req: Request, res: Response) => {
+export const toggleActivo = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const content = await Content.findById(req.params.id);
-    if (!content)
-      return res.status(404).json({ message: "Contenido no encontrado" });
+    if (!content) {
+      res.status(404).json({ message: "Contenido no encontrado" });
+      return;
+    }
 
     content.activo = !content.activo;
     await content.save();
