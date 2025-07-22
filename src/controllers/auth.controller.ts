@@ -9,7 +9,12 @@ import { Service } from "../models/Service";
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || "contraseniasegura";
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET no definido en variables de entorno");
+}
+
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
 });
@@ -193,8 +198,14 @@ export const refreshToken = async (
   }
 
   try {
-    const decoded = jwt.verify(token, "secret") as { id: string };
-    const newAccessToken = jwt.sign({ id: decoded.id }, "secret", {
+    const secret = process.env.JWT_SECRETO;
+
+    if (!secret) {
+      throw new Error("JWT_SECRETO no definido en variables de entorno");
+    }
+
+    const decoded = jwt.verify(token, secret) as { id: string };
+    const newAccessToken = jwt.sign({ id: decoded.id }, secret, {
       expiresIn: "15m",
     });
 
