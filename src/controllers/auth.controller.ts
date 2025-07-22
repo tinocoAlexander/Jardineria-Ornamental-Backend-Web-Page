@@ -32,6 +32,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // Incluye el rol en el token
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: "1h",
     });
@@ -43,6 +44,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         nombre: user.nombre,
         email: user.email,
         avatar: user.avatar,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -56,21 +58,43 @@ export const registerAdmin = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { nombre, email, password } = req.body;
+    const { nombre, apellido, email, password, telefono, direccion, rol } =
+      req.body;
 
-    const existingAdmin = await User.findOne({ email });
-    if (existingAdmin) {
+    // Validación de campos requeridos
+    if (!nombre || !apellido || !email || !password || !telefono || !rol) {
+      res
+        .status(400)
+        .json({ message: "Todos los campos obligatorios deben estar llenos" });
+      return;
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       res.status(403).json({ message: "El usuario con ese correo ya existe" });
       return;
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ nombre, email, password: hashedPassword });
+
+    const user = new User({
+      nombre,
+      apellido,
+      email,
+      password: hashedPassword,
+      telefono,
+      direccion,
+      rol,
+    });
+
     await user.save();
 
-    res.status(201).json({ message: "Se ha creado el administrador" });
+    res.status(201).json({ message: "Administrador creado correctamente" });
   } catch (error) {
-    res.status(500).json({ message: "Error al crear el administrador" });
+    console.error("❌ Error al registrar admin:", error);
+    res
+      .status(500)
+      .json({ message: "Error interno al crear el administrador" });
   }
 };
 
